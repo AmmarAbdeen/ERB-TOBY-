@@ -1,0 +1,92 @@
+﻿<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../template/newTemplate.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <ui:define name="content">
+                <f:event listener="#{userData.authorize}" type="preRenderView" />
+        <h:form id="branchListForm" dir="#{userData.dir}">
+            <p:fieldset legend="#{userData.userDDs['START_BALAN_SUPPLIER']}" style="margin-bottom:20px; margin-right: 30px">
+                <div>
+                    <p:messages autoUpdate="true" id="messages" showDetail="true" closable="true" />
+                </div>
+               
+                <p:commandButton class="scloseButton" style="float: left" icon="fa fa-fw fa-backward"
+                                     title="#{userData.userDDs['CLOSE']}" action="exit" />
+               
+                <div>
+                    <p:dataTable draggableColumns="true"
+                                 draggableRows="true"
+                                 var="siteTable"
+                                 widgetVar="bTable"
+                                 rowIndexVar="index"
+                                 value="#{organizationSiteOpeningBalanceListMB.organizationSideOpeningBalanceEntityList}"
+                                 rows="#{userData.rowListCount}" paginator="true"
+                                 emptyMessage="#{userData.userDDs['EMPTY_TABLE']}"
+                                 id="siteListForm">
+                        <f:facet name="header" >
+
+                            <p:outputPanel>
+                                <h:outputText value="#{userData.userDDs['SEARCH']} : "
+                                              style="font-size: large" />
+                                <p:inputText id="globalFilter" 
+                                             a:autofocus="true"
+                                             onkeyup="PF('bTable').filter()"
+                                             style="width:150px" />
+                            </p:outputPanel>
+                        </f:facet>
+
+                        <p:column  style="width: 5vh;font-size: 1.8vh;text-align: -webkit-auto" headerText="#{userData.userDDs['CS_COD']}">
+                            <p:outputLabel value="#{siteTable.code}" />
+                        </p:column>
+                        <p:column style="width: 12vh;font-size: 1.8vh;font-size: -webkit-auto" filterStyle="display:none"
+                                  filterBy="#{siteTable.organizationSiteName}"
+                                  filterMatchMode="contains" headerText="#{userData.userDDs['HAND_HANDLE']}"
+                                  sortBy="#{siteTable.organizationSiteName}" >
+                            <p:outputLabel value="#{siteTable.organizationSiteName}" />
+                        </p:column>
+                        <p:column style="width: 12vh;font-size: 1.8vh;text-align: -webkit-auto" filterStyle="display:none"
+                                  filterBy="#{siteTable.openBalanceDebit}"
+                                  filterMatchMode="contains" headerText="#{userData.userDDs['Debit_BALANC']}"
+                                  sortBy="#{siteTable.openBalanceDebit}" >
+                            <p:outputLabel value="#{siteTable.openBalanceDebit}" />
+                        </p:column>
+                        <p:column  style="width: 12vh;font-size: 1.8vh;text-align: -webkit-auto" filterStyle="display:none"
+                                  filterBy="#{siteTable.openBalanceCredit}"
+                                  filterMatchMode="contains" headerText="#{userData.userDDs['CREDIT_BALANC']}"
+                                  sortBy="#{siteTable.openBalanceCredit}" >
+                            <p:outputLabel value="#{siteTable.openBalanceCredit}" />
+                        </p:column>
+
+                        <p:column  style="width: 10vh;font-size: 1.8vh;text-align: -webkit-auto" filterStyle="display:none"
+                                  filterBy="#{siteTable.organizationBalanceDate}"
+                                  filterMatchMode="contains" headerText="#{userData.userDDs['DATEE']}"
+                                  sortBy="#{siteTable.organizationBalanceDate}" >
+                            <p:outputLabel value="#{siteTable.organizationBalanceDate}" >
+                                <f:convertDateTime pattern="MM/dd/YYYY" />
+                            </p:outputLabel>
+                        </p:column>
+
+                        <p:column style="width: 10vh;font-size: 1.8vh;text-align: -webkit-auto" headerText="#{userData.userDDs['TRANSACTION']}"
+                                  >
+                            <p:commandButton class="seditButton" update="@form" icon="fa fa-fw fa-edit"
+                                             title="#{userData.userDDs['EDIT']}"
+                                             action="#{organizationSiteOpeningBalanceListMB.goToEdit()}"
+                                             rendered="#{userData.userScreens['supplierOpeningBalance'].edit or userData.isAdmin}">
+                                <f:setPropertyActionListener value="#{siteTable.id}"
+                                                             target="#{organizationSiteOpeningBalanceListMB.organizationSiteOpeningBalanceId}" />
+                            </p:commandButton>
+
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </p:fieldset>
+        </h:form>
+    </ui:define>
+</ui:composition>
+
+

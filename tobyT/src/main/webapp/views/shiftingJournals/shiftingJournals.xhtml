@@ -1,0 +1,285 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../template/newTemplate.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <ui:define name="content">
+        <f:event listener="#{userData.authorize}" type="preRenderView"/>
+
+        <h:form  id="form"  style="margin-right: 20px" dir="#{userData.dir}">
+            <p:fieldset legend="#{userData.userDDs['MIGRAT_ACCOUNT']}" style="margin-bottom:20px">
+
+                <div>
+                    <p:messages autoUpdate="true"  id="msg" showDetail="true" closable="true" rendered="true" />
+                </div>
+
+                <div  id="firstLine" class="ui-g-12 ui-g-nopad">
+                    <div class="ui-g">
+
+                        <div class="ui-g-12 ui-md-6">
+
+                            <h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel style="width: 60px" value="#{userData.userDDs['JOURNAL_TYPE']}" 
+                                                    />
+                                </h:panelGroup>
+                               
+                                <h:panelGroup>
+                                    <p:selectOneMenu value="#{shiftingJournalMB.symbolId}" id="GlAccount_ID_from" >
+                                        <f:selectItem itemLabel="#{userData.userDDs['CHOOSE']}"  itemValue="" />
+                                        <f:selectItems value="#{shiftingJournalMB.options}" var="opt" itemLabel="#{opt.label}" itemValue="#{opt.value}"/>
+                                        <p:ajax update="@form" process="@form" listener="#{shiftingJournalMB.loadDataTableHead()}" />
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </div>
+                        <div class="ui-g-12 ui-md-6">
+                            <h:panelGroup>   
+
+                                <h:panelGroup>
+                                    <p:outputLabel style="width:60px;" value="#{userData.userDDs['FINANCE_YEAR']}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:selectOneMenu style="width:45%" id="year" filter="true" filterMatchMode="contains"   value="#{shiftingJournalMB.glYearSelection}" converter="#{shiftingJournalMB.glYearConverter}"   >
+                                        <p:ajax update="dateFrom dateTo" listener="#{shiftingJournalMB.pushGlYearSelection()}" />
+                                        <f:selectItem itemLabel="#{userData.userDDs['CHOOSE']}"  itemValue="" />
+                                        <f:selectItems value="#{shiftingJournalMB.glYearList}"  var="year" itemLabel="#{year.name}" itemValue="#{year}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                            </h:panelGroup>
+                        </div>
+                        <div class="ui-g-12 ui-md-6">
+                            <h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel style="width: 60px"  value="#{userData.userDDs['YEAR_FROM']}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:calendar style="width: 45%"   id="dateFrom"
+                                                value="#{shiftingJournalMB.dateFrom}"
+                                                pattern="dd/MM/yyyy" showButtonPanel="true" >
+                                        <p:ajax listener="#{shiftingJournalMB.checkDate(true)}" event="dateSelect" update="dateFrom"/>
+                                    </p:calendar>
+                                </h:panelGroup>
+
+                            </h:panelGroup>
+                        </div>
+                        <div class="ui-g-12 ui-md-6">
+                            <h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:outputLabel style="width: 60px"  value="#{userData.userDDs['YEAR_TO']}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:calendar style="width: 45%"  id="dateTo"
+                                                value="#{shiftingJournalMB.dateTo}"
+                                                pattern="MM/dd/yyyy"  showButtonPanel="true" >
+                                        <p:ajax listener="#{shiftingJournalMB.checkDate(false)}" event="dateSelect" update="dateTo"/>
+                                    </p:calendar>
+
+                                </h:panelGroup>
+
+                            </h:panelGroup>
+                        </div>
+                        <div class="ui-g-12 ui-md-6">
+                            <h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel style="width: 60px"  value="#{userData.userDDs['CONSTRAINTS_STAGE']}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:selectBooleanCheckbox style="width:45%;margin-right: 2%" value="#{shiftingJournalMB.shiftedJournals}">
+                                        <p:ajax  listener="#{shiftingJournalMB.showShiftedJournals}" update="@form" />
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+
+                <h:panelGrid  class="centerButtons col-md-12" columns="1">
+                    <h:panelGroup>
+                        <p:commandButton  class="midrateallButtons" value="#{userData.userDDs['MIDRATE_ALL']}"  
+                                          id="movTo"
+                                          action="#{shiftingJournalMB.shift}" update="form"
+                                          disabled="#{shiftingJournalMB.postRestrictionsViewList.size() eq 0 or shiftingJournalMB.shiftedJournals}" >
+                            <p:confirm disabled="#{shiftingJournalMB.postRestrictionsViewList.size() eq 0}" header="#{userData.userDDs['COFIGRATION']}" message="#{userData.userDDs['ARE_YOU_SURE']}" icon="ui-icon-alert" />
+                        </p:commandButton>
+
+                        <p:commandButton  id="Cancelb" class="cancellmidrateButtons"  style="width: 100px" 
+                                          value="#{userData.userDDs['CANCEL_RELAY']}" action="#{shiftingJournalMB.undoShifting}" 
+                                          update="form"
+                                          disabled="#{shiftingJournalMB.postRestrictionsViewList.size() eq 0 or not shiftingJournalMB.shiftedJournals}" >
+                            <p:confirm disabled="#{shiftingJournalMB.postRestrictionsViewList.size() eq 0}"
+                                       header="#{userData.userDDs['COFIGRATION']}" message="#{userData.userDDs['ARE_YOU_SURE']}" icon="ui-icon-alert" />
+
+                        </p:commandButton>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton title="#{userData.userDDs['YES']}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                            <p:commandButton title="#{userData.userDDs['NO']}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                        </p:confirmDialog>
+
+
+                    </h:panelGroup>
+                </h:panelGrid>
+
+            </p:fieldset>
+
+            <p:fieldset>
+
+                <p:dataTable 
+                    style="margin-top: 20px"
+                    widgetVar="postRestrict" 
+                    var="postRestrict" 
+                    dir="#{userData.dir}" 
+                    rows="8"  
+                    selection="#{shiftingJournalMB.postRestrictionsView}" 
+                    selectionMode="single"   
+                    rowKey="#{postRestrict}" 
+                    value="#{shiftingJournalMB.postRestrictionsViewList}"                    
+                    paginator="true" 
+                    rowIndexVar="index" 
+                    emptyMessage="#{userData.userDDs['EMPTY_TABLE']}" >
+
+                    <f:facet name="header" class="col-md-12">
+
+                        <p:outputPanel>
+                            <h:outputText value="#{userData.userDDs['SEARCH']} : "  style="font-size: large;" />
+                            <p:inputText   id="globalFilter"   onkeyup="PF('cashSett').filter()" style="width: 50%important" />
+                        </p:outputPanel>
+
+                    </f:facet>
+
+                    <p:ajax  event="rowSelect"   listener="#{shiftingJournalMB.onRowSelect}"  update="@form"/>
+                    <p:column headerText="#" style="width: 5%;font-size: 15px;text-align: -webkit-auto;" >
+                        <h:outputText value="#{index + 1}" style="width: 5%;font-size: 12px;" />
+                    </p:column>               
+                    <p:column   style="font-size: 1.4vh;width: 15vh;text-align:center!important" sortBy="#{postRestrict.date}"  filterBy="#{postRestrict.date}"  filterMatchMode="contains" headerText=" #{userData.userDDs['DATEE']} " >
+                        <h:outputText      value="#{postRestrict.date}"  > 
+                            <f:convertDateTime     pattern="yyyy-MM-dd" /> 
+                        </h:outputText>                        
+                    </p:column>
+                    <p:column  style="font-size: 1.4vh;width: 15vh;text-align:center!important"
+                               sortBy="#{postRestrict.remark}" filterBy="#{postRestrict.remark}"  
+                               filterMatchMode="contains" headerText="#{userData.userDDs['MOVEMENT']}">
+                        <h:outputText  value="#{postRestrict.remark}" />
+                    </p:column>
+                    <p:column style="font-size: 1.4vh;width: 15vh;text-align:center!important"  headerText="#{userData.userDDs['DOCUMENT_NUMBER']}"  
+                              sortBy="#{postRestrict.serial}"  filterBy="#{postRestrict.serial}"  filterMatchMode="contains" >
+                        <h:outputText value="#{postRestrict.serial}" />
+                    </p:column>
+                    <p:column style="font-size: 1.4vh;width: 15vh;text-align:center!important"  headerText="#{userData.userDDs['YEAR']}" 
+                              sortBy="#{postRestrict.glYear}"  filterBy="#{postRestrict.glYear}"  filterMatchMode="contains">
+                        <h:outputText value="#{postRestrict.glYear}" />
+                    </p:column>
+                    <p:column style="font-size: 1.4vh;width: 15vh;text-align:center!important"  headerText="#{userData.userDDs['DEPORTED']}" 
+                              sortBy="#{postRestrict.generalJournalId}"  filterBy="#{postRestrict.generalJournalId}"  filterMatchMode="contains">
+                        <h:outputText value="#{postRestrict.generalJournalId}" />
+                    </p:column>
+
+                    <p:column style="font-size: 1.4vh;width: 10vh" >
+                        <p:commandButton  class="ssaveButton" title="#{userData.userDDs['ACCOUNT_MIGRATION']}"  
+                                          action="#{shiftingJournalMB.shift}"
+                                          update="form"
+                                          icon="fa fa-check "
+                                          disabled="#{shiftingJournalMB.shiftedJournals}"
+                                          >
+                            <f:setPropertyActionListener value="#{postRestrict}" target="#{shiftingJournalMB.postRestrictionsSelected}"  />
+                        </p:commandButton>
+
+                        <p:commandButton   class="sreloadButton" update="form" title="#{userData.userDDs['CANCEL_MIGRATION']}" 
+                                           action="#{shiftingJournalMB.undoShifting}" 
+
+                                           icon="fa fa-fw fa-undo"
+                                           disabled="#{not shiftingJournalMB.shiftedJournals}"
+                                           >
+                            <f:setPropertyActionListener value="#{postRestrict}" target="#{shiftingJournalMB.postRestrictionsSelected}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+
+                <p:dataTable 
+                    widgetVar="" 
+                    var="postRestrictDetails" 
+                    selection="#{shiftingJournalMB.postRestrictionsDetailsBeanSelection}" 
+                    selectionMode="single"   
+                    rowKey="#{postRestrictDetails}"
+                    dir="#{userData.dir}" 
+                    value="#{shiftingJournalMB.postRestrictionDetailsBeanList}"      
+                    rows="10"  
+                    paginator="true" 
+                    emptyMessage="#{userData.userDDs['EMPTY_TABLE']}" >
+
+                    <p:ajax  event="rowSelect"   listener="#{shiftingJournalMB.onRowDetailsSelect}"  update="@form"/>
+
+                    <p:column headerText="#{userData.userDDs['ACCOUNT_NUMBER']}"  style="font-size: 1.4vh;width: 12vh"   >
+                        <h:outputText  value="#{postRestrictDetails.accNumber}" />
+                    </p:column>
+                    <p:column headerText="#{userData.userDDs['ACCOUNT_NAME']}"  style="font-size: 1.4vh;width: 12vh">
+                        <h:outputText  value="#{postRestrictDetails.accName}" />
+                    </p:column>
+                    <p:column headerText="#{userData.userDDs['DESCRIBTION']}"  style="font-size: 1.4vh;width: 12vh">
+                        <h:outputText  value="#{postRestrictDetails.remarks}" />
+                    </p:column>
+
+                    <p:column headerText="#{userData.userDDs['DEBIT']}"  style="font-size: 1.4vh;width: 12vh">
+                        <h:outputText  value="#{postRestrictDetails.valueDebit}" />
+                    </p:column>
+
+                    <p:column headerText="#{userData.userDDs['CREDIT']}"  style="font-size: 1.4vh;width: 12vh">
+                        <h:outputText  value="#{postRestrictDetails.valueCredit}" />
+                    </p:column>
+
+                    <p:column headerText="#{userData.userDDs['DEBIT_CURRENCIES']}"  style="font-size: 1.4vh;width: 12vh">
+                        <h:outputText  value="#{postRestrictDetails.valueLocalDebit}" />
+                    </p:column>
+
+                    <p:column headerText="#{userData.userDDs['CURRENCY_CREDIT']}"  style="font-size: 1.4vh;width: 12vh">
+                        <h:outputText  value="#{postRestrictDetails.valueLocalCredit}" />
+                    </p:column>
+                    <p:columnGroup type="footer">
+                        <p:row>
+                            <p:column colspan="3" footerText="#{userData.userDDs['TOTAL']} " />                           
+                            <p:column footerText="#{shiftingJournalMB.debitFinalSummary}" />
+                            <p:column footerText="#{shiftingJournalMB.creditFinalSummary}" />
+                            <p:column colspan="2"  footerText="" />
+                        </p:row>
+                        <p:row>
+                            <p:column footerText="#{userData.userDDs['COST_CENTER']}" />                           
+                            <p:column colspan="2" footerText="#{shiftingJournalMB.costCenterShow.code}#{shiftingJournalMB.costCenterShow.name}" />
+                            <p:column footerText="#{userData.userDDs['ADMIN_UNIT']}" />
+                            <p:column colspan="3" footerText="#{shiftingJournalMB.adminUnitShow.code}#{shiftingJournalMB.adminUnitShow.name}" />
+                        </p:row>
+                    </p:columnGroup>
+                </p:dataTable>
+                 <h:panelGrid class="col-md-12 centerButtons" columns="1">
+
+                        <h:panelGroup>
+
+                            <p:commandButton class="closeButton" 
+                                         title="#{userData.userDDs['CANCEL']}" 
+                                         immediate="true" 
+                                         value="#{userData.userDDs['CANCEL']}" 
+                                         icon="fa fa-fw fa-backward" 
+                                         action="exit"   />
+
+                        </h:panelGroup>
+
+                    </h:panelGrid>
+            </p:fieldset>
+            
+           
+
+            <p:blockUI block="form" trigger="GlAccount_ID_from movTo Cancelb  "  animate="true" >
+
+                <p:graphicImage library="img" name="9wcA.gif" ></p:graphicImage>
+
+            </p:blockUI> 
+
+        </h:form>
+    </ui:define>
+</ui:composition>
